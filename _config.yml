@@ -86,13 +86,13 @@ service-worker: true
 # Friends
 friends: [
     {
-        title: "简书·BY",
-        href: "http://www.jianshu.com/u/e71990ada2fd"
+        title: "白也",
+        href: "https://github.com/chunhui01"
     },{
         title: "搭建教程",
         href: "https://www.jianshu.com/p/e68fba58f75c"
     },{
-        title: "白也",
-        href: "https://github.com/chunhui01"
+        title: "简书·BY",
+        href: "http://www.jianshu.com/u/e71990ada2fd"
     }
 ]
