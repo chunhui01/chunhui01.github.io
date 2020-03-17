@@ -26,17 +26,14 @@ tags:
 ps -ef | grep nginx | grep -v grep | grep work
 
 3.为什么不是几个worker进程都内存增大，只是个别worker进程内存占用很大？ 查看日志，过滤掉干扰内容。
-cat error.log | grep -v '\[dns\]' | grep -v 'access forbidden by rule’
 
-![](https://upload-images.jianshu.io/upload_images/22431078-fa049972c1497bca.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+- cat error.log | grep -v '\[dns\]' | grep -v 'access forbidden by rule’
+  ![](https://upload-images.jianshu.io/upload_images/22431078-fa049972c1497bca.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  发现并不是那个子进程没有内存泄露，而是那个子进程频繁被kill，然后master又重启新的子进程。查询系统日志确认。
 
-发现并不是那个子进程没有内存泄露，而是那个子进程频繁被kill，然后master又重启新的子进程。查询系统日志确认。
-
-dmesg | grep pid
-
-![](https://upload-images.jianshu.io/upload_images/22431078-955bdfa1512ba193.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-确认那些内存占用底的worker进程是被oom kill了，然后被master又重启新的子进程。
+- dmesg | grep pid
+  ![](https://upload-images.jianshu.io/upload_images/22431078-955bdfa1512ba193.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  确认那些内存占用底的worker进程是被oom kill了，然后被master又重启新的子进程。
 
 4.确定了是指定进程内存泄露后，查看该进程的内存分配，定位泄露信息。
 - dump出改进程的内存分配，确认确实存在超大块内存分配。
