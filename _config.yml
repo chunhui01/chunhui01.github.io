@@ -4,7 +4,7 @@ SEOTitle: 白也的博客 | BaiYe Blog
 header-img: img/post-bg-desk.jpg
 email: chunhui01@outlook.com
 description: "Be yourself. Everyone else is already taken."
-keyword: "BaiYe, BaiYe Blog, 白也的博客, wanchunhui, 万春辉, 春辉, 区块链, golang"
+keyword: "BaiYe, BaiYe Blog, 白也的博客, 区块链, golang"
 url: "https://chunhui01.github.io"          # your host, for absolute URL
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
 github_repo: "https://github.com/chunhui01/chunhui01.github.io.git" # you code repository
