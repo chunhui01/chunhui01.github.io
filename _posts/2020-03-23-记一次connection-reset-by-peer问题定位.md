@@ -105,13 +105,13 @@ ulimit -a
 理论上能解释通了，线下模拟实现验证，在接口中sleep(100s)，压测很快就复现了connect reset by peer，现象和线上问题case完全一致，确认猜想。那么接下来定位的重点就是为什么服务端会突然出现阻塞？由于不稳定复现，是什么触发了阻塞？
 
 #### SOCKET工作流程
-![套接字工作流程](https://chunhui01.github.io/img/post_bg/套接字工作流程.png)
+![套接字工作流程](https://raw.githubusercontent.com/chunhui01/chunhui01.github.io/master/img/post_bg/套接字工作流程.png)
 
 #### epoll
-![epoll原理](https://chunhui01.github.io/img/post_bg/epoll原理.png)
+![epoll原理](https://raw.githubusercontent.com/chunhui01/chunhui01.github.io/master/img/post_bg/epoll原理.png)
 
 #### TCP状态流转图：
-![TCP状态流转图](https://chunhui01.github.io/img/post_bg/TCP状态流转图.png)
+![TCP状态流转图](https://raw.githubusercontent.com/chunhui01/chunhui01.github.io/master/img/post_bg/TCP状态流转图.png)
 
 #### TCP SOCKET状态表：
 - CLOSED: 关闭状态，没有连接活动
@@ -127,10 +127,10 @@ ulimit -a
 - CLOSING: 双方同时尝试关闭，等待对方确认 
 
 #### 三次握手
-![TCP三次握手](https://chunhui01.github.io/mg/post_bg/TCP三次握手.png)
+![TCP三次握手](https://raw.githubusercontent.com/chunhui01/chunhui01.github.io/master/img/post_bg/TCP三次握手.png)
 
 #### 四次挥手
-![TCP四次挥手](https://chunhui01.github.io/img/post_bg/TCP四次挥手.png)
+![TCP四次挥手](https://raw.githubusercontent.com/chunhui01/chunhui01.github.io/master/img/post_bg/TCP四次挥手.png)
 
 6.到了应用程序层面，要分析进程过去发生了什么，只能从应用日志和服务监控入手了，从历史监控曲线（内存、句柄、流量、耗时等）查找可能出现异常的时间点，再找关键时间点的日志仔细分析。发现刚开始是处理耗时增长，然后只能输出access_log，最后才到请求无日志输出，从日志完成验证上面的分析猜想。发现耗时突增是关键点，仔细分析业务日志，发现是请求DB耗时增加，再进一步看访问DB的统计信息，发现DB连接池一直在被打满，请求排队等空闲待链接，导致请求处理耗时增加，然后排队请求越来越多，直到句柄数被打满。由于DB连接池新建链接需要句柄，句柄被排队等空闲链接的请求给打满了，形成了死锁。也就出现了从超时到句柄被打满还无法释放的情况。线上环境修改DB连接池配置，压测果然很快复现了。至此，终于发现了真相（哭晕，再次证明了完善的日志和监控的重要性）。
 
