@@ -51,6 +51,14 @@ lo        Link encap:Local Loopback
 /usr/sbin/tcpdump -i eth0 -n -nn host 10.xx.xx.35
 
 发现TCP三次握手完成，在发送数据时服务端没有响应ACK，而响应了reset，导致客户端http请求响应connection reset by peer。
+
+tcpdump结果Flags含义：
+Flags [S]:请求连接
+Flags [S.]:sync+ack
+Flags [.]:ack
+Flags [P.]:发送数据包
+Flags [F]:发送方没有更多包发送了
+Flags [R]:表明packet的发送方马上就要断开当前连接了
 ```
 
 3.服务端通过listen(sockfd, backlog)方法告诉内核监听该socket并设置队列大小（未完成链接队列+已完成连接队列），然后当客户端通过connect()方法请求链接时，由系统内核完成TCP三次握手，并把请求放入已完成连接队列，等待调用accept()方法取走，accept()需要先通过socket()创建新的句柄。
@@ -196,3 +204,4 @@ ls /proc/$pid/fd/  | wc -l
 - [epoll原理图解]https://blog.csdn.net/qq_35433716/article/details/85345907
 - [TCP网络编程中connect()、listen()和accept()三者之间的关系]https://blog.csdn.net/dengjin20104042056/article/details/52357452
 - [从源码角度看Golang的TCP Socket(epoll)实现]https://www.jianshu.com/p/3ff0751dfa04
+- [tcpdump含义] https://testerhome.com/topics/22107
